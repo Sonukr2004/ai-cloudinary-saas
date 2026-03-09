@@ -86,7 +86,7 @@ export default function AppLayout({
             </div>
             <div className="flex-1">
               <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer burning-text">
+                <div className="btn btn-ghost normal-case text-lg sm:text-2xl font-bold tracking-tight cursor-pointer burning-text">
                   CloudCraft Studio
                 </div>
               </Link>
@@ -125,12 +125,12 @@ export default function AppLayout({
                       />
                     </div>
                   </div>
-                  <span className="text-sm truncate max-w-xs lg:max-w-md">
+                  <span className="text-sm truncate max-w-xs lg:max-w-md hidden sm:inline">
                     {user.username || user.emailAddresses[0].emailAddress}
                   </span>
                   <button
                     onClick={handleSignOut}
-                    className="btn btn-ghost btn-circle"
+                    className="btn btn-ghost btn-circle hidden sm:flex"
                   >
                     <LogOutIcon className="h-6 w-6" />
                   </button>
@@ -173,6 +173,16 @@ export default function AppLayout({
                 </Link>
               </li>
             ))}
+            {/* Mobile only theme toggle */}
+            <li className="mt-2 sm:hidden">
+              <button
+                className="flex items-center space-x-4 px-4 py-2 rounded-lg hover:bg-base-300 w-full"
+                onClick={() => setTheme(theme === "dark" || theme === "cloudcraft" ? "light" : "cloudcraft")}
+              >
+                <span className="text-xl">{theme === "light" ? "🌙" : "☀️"}</span>
+                <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+              </button>
+            </li>
           </ul>
           {user && (
             <div className="p-4">

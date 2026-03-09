@@ -12,12 +12,10 @@ export default function AboutPage() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-900/40 via-base-100 to-purple-900/40 p-6 md:p-10">
-      {/* floating blobs */}
       <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-primary opacity-20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-20 h-72 w-72 rounded-full bg-secondary opacity-20 blur-3xl" />
 
       <div className="relative space-y-8">
-        {/* local navbar for about sections (acts like tabs) */}
         <div className="navbar rounded-2xl bg-base-100/80 shadow-lg backdrop-blur mb-2">
           <div className="flex-1">
             <span className="btn btn-ghost text-xl font-bold normal-case">
@@ -25,37 +23,26 @@ export default function AboutPage() {
             </span>
           </div>
           <div className="flex-none">
-            <div className="tabs tabs-boxed">
-              <button
-                className={`tab ${active === "all" ? "tab-active" : ""}`}
-                onClick={() => setActive("all")}
-              >
-                All
-              </button>
-              <button
-                className={`tab ${active === "overview" ? "tab-active" : ""}`}
-                onClick={() => setActive("overview")}
-              >
-                Overview
-              </button>
-              <button
-                className={`tab ${active === "video" ? "tab-active" : ""}`}
-                onClick={() => setActive("video")}
-              >
-                Video
-              </button>
-              <button
-                className={`tab ${active === "images" ? "tab-active" : ""}`}
-                onClick={() => setActive("images")}
-              >
-                Images
-              </button>
-              <button
-                className={`tab ${active === "auth" ? "tab-active" : ""}`}
-                onClick={() => setActive("auth")}
-              >
-                Auth
-              </button>
+            {/* MOBILE: dropdown */}
+            <select
+              className="select select-bordered select-sm sm:hidden"
+              value={active}
+              onChange={(e) => setActive(e.target.value as AboutSection)}
+            >
+              <option value="all">All</option>
+              <option value="overview">Overview</option>
+              <option value="video">Video</option>
+              <option value="images">Images</option>
+              <option value="auth">Auth</option>
+            </select>
+
+            {/* DESKTOP: original tabs */}
+            <div className="tabs tabs-boxed hidden sm:flex">
+              <button className={`tab ${active === "all" ? "tab-active" : ""}`} onClick={() => setActive("all")}>All</button>
+              <button className={`tab ${active === "overview" ? "tab-active" : ""}`} onClick={() => setActive("overview")}>Overview</button>
+              <button className={`tab ${active === "video" ? "tab-active" : ""}`} onClick={() => setActive("video")}>Video</button>
+              <button className={`tab ${active === "images" ? "tab-active" : ""}`} onClick={() => setActive("images")}>Images</button>
+              <button className={`tab ${active === "auth" ? "tab-active" : ""}`} onClick={() => setActive("auth")}>Auth</button>
             </div>
           </div>
         </div>
@@ -89,8 +76,7 @@ export default function AboutPage() {
                 Upload once on the <strong>Video Upload</strong> page and let
                 Cloudinary automatically compress your videos while keeping good
                 visual quality. The app tracks original vs. compressed size,
-                duration, and upload time so you can see how much space you
-                save.
+                duration, and upload time so you can see how much space you save.
               </p>
             </div>
           </section>
@@ -125,7 +111,7 @@ export default function AboutPage() {
                 Facebook, and LinkedIn. Choose the format, quality, filters, and
                 add overlay text before downloading.
               </p>
-            </div>  
+            </div>
           </section>
 
           <section
@@ -139,8 +125,7 @@ export default function AboutPage() {
               <p>
                 Clerk handles sign up, login, and providers like Google or
                 GitHub. After you authenticate, you land in a simple dashboard
-                with navigation between video tools and the social image
-                creator.
+                with navigation between video tools and the social image creator.
               </p>
             </div>
           </section>
@@ -157,5 +142,3 @@ export default function AboutPage() {
     </div>
   );
 }
-
-
