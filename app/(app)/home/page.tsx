@@ -104,7 +104,8 @@ function Home() {
               }
             }
 
-            blob = new Blob(chunks);
+           blob = new Blob(chunks as BlobPart[]);
+
           }
 
           const objectUrl = window.URL.createObjectURL(blob);

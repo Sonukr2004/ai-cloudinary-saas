@@ -34,6 +34,8 @@ function VideoUpload() {
       cloudinaryFormData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
       cloudinaryFormData.append("folder", "video-uploads");
       cloudinaryFormData.append("resource_type", "video");
+      cloudinaryFormData.append("eager", `q_${quality}|vc_auto`);
+      cloudinaryFormData.append("eager_async", "false");
 
       const cloudinaryRes = await axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
