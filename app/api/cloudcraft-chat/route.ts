@@ -59,7 +59,7 @@ Do not fabricate features not listed above.
           "X-Title": "CloudCraft Chat",
         },
         body: JSON.stringify({
-          model: process.env.OPENROUTER_CHAT_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+          model: process.env.OPENROUTER_CHAT_MODEL || "google/gemma-3-4b-it:free",
           messages: chatMessages,
           temperature: 0.7,
           max_tokens: 1024,
@@ -82,7 +82,7 @@ Do not fabricate features not listed above.
   } catch (error) {
     console.error("Chat error:", error);
     return NextResponse.json(
-      { error: "Failed to process request" },
+      { error: "Too many requests! The AI is overwhelmed. Please try again tomorrow. " },
       { status: 500 }
     );
   }
