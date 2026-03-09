@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
 import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,19 +12,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const { title, description, publicId, originalSize, duration } =
+    const { title, description, publicId, originalSize, compressedSize, duration } =
       await request.json();
-
-    // Fetch actual compressed size from Cloudinary
-    let compressedSize = originalSize;
-    try {
-      const resource = await cloudinary.api.resource(publicId, {
-        resource_type: "video",
-      });
-      compressedSize = String(resource.bytes);
-    } catch (e) {
-      console.log("Could not fetch compressed size", e);
-    }
 
     const video = await prisma.video.create({
       data: {
