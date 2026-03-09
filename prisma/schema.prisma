@@ -10,11 +10,12 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
+    url = env("DATABASE_URL")
 }
 
 model Video {
     id             String   @id @default(cuid())
+    userId         String?  // Clerk user ID (null for old records)
     title          String
     description    String?
     publicId       String

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
@@ -10,13 +10,16 @@ import {
   LayoutDashboardIcon,
   Share2Icon,
   UploadIcon,
-  ImageIcon,
+  InfoIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 
 const sidebarItems = [
   { href: "/home", icon: LayoutDashboardIcon, label: "Home Page" },
   { href: "/social-share", icon: Share2Icon, label: "Social Share" },
+  { href: "/cloudcraft-chat", icon: MessageSquareIcon, label: "Talk to CloudCraft" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
+  { href: "/about", icon: InfoIcon, label: "About" },
 ];
 
 export default function AppLayout({
@@ -25,6 +28,9 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<"cloudcraft" | "light" | "dark" | "cupcake">(
+    "cloudcraft"
+  );
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useClerk();
@@ -38,6 +44,25 @@ export default function AppLayout({
     await signOut();
   };
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("cc-theme") as
+      | "cloudcraft"
+      | "light"
+      | "dark"
+      | "cupcake"
+      | null;
+    const initial = stored || "cloudcraft";
+    setTheme(initial);
+    document.documentElement.setAttribute("data-theme", initial);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem("cc-theme", theme);
+  }, [theme]);
+
   return (
     <div className="drawer lg:drawer-open">
       <input
@@ -49,7 +74,7 @@ export default function AppLayout({
       />
       <div className="drawer-content flex flex-col">
         {/* Navbar */}
-        <header className="w-full bg-base-200">
+        <header className="w-full bg-gradient-to-r from-base-200 via-base-100 to-base-200/80 shadow-sm">
           <div className="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex-none lg:hidden">
               <label
@@ -61,12 +86,33 @@ export default function AppLayout({
             </div>
             <div className="flex-1">
               <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer">
-                  Cloudinary Showcase
+                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer burning-text">
+                  CloudCraft Studio
                 </div>
               </Link>
             </div>
             <div className="flex-none flex items-center space-x-4">
+              <div className="form-control hidden sm:block">
+                <label className="label cursor-pointer gap-2">
+                  <span className="label-text text-xs">Theme</span>
+                  <select
+                    className="select select-bordered select-xs"
+                    value={theme}
+                    onChange={(e) =>
+                      setTheme(e.target.value as
+                        | "cloudcraft"
+                        | "light"
+                        | "dark"
+                        | "cupcake")
+                    }
+                  >
+                    <option value="cloudcraft">CloudCraft</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="cupcake">Cupcake</option>
+                  </select>
+                </label>
+              </div>
               {user && (
                 <>
                   <div className="avatar">
@@ -104,7 +150,11 @@ export default function AppLayout({
         <label htmlFor="sidebar-drawer" className="drawer-overlay"></label>
         <aside className="bg-base-200 w-64 h-full flex flex-col">
           <div className="flex items-center justify-center py-4">
-            <ImageIcon className="w-10 h-10 text-primary" />
+            <div className="avatar placeholder">
+              <div className="w-14 rounded-2xl bg-gradient-to-tr from-primary to-secondary text-primary-content flex items-center justify-center text-xl font-extrabold shadow-lg">
+                CS
+              </div>
+            </div>
           </div>
           <ul className="menu p-4 w-full text-base-content flex-grow">
             {sidebarItems.map((item) => (
