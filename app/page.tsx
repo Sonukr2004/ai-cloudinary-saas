@@ -51,9 +51,11 @@ export default function LandingPage() {
       </div>
 
       {/* Heading */}
-      <h1 className="text-4xl sm:text-6xl font-extrabold mb-4 burning-text">
-        CloudCraft Studio
-      </h1>
+  
+
+      <h1 className="text-4xl sm:text-6xl font-extrabold mb-4 burning-text" style={{animation: "pulse 2s ease-in-out infinite"}}>
+  CloudCraft Studio
+</h1>
       <p className="text-base-content/70 text-lg max-w-xl mb-8">
         Compress videos, create social media images, and manage your media — all powered by Cloudinary AI.
       </p>
