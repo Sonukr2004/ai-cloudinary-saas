@@ -257,7 +257,7 @@ const socialFormats = {
                     </div>
                   </div>
 
-                  <div className="card-actions justify-end mt-6">
+               <div className="card-actions justify-center sm:justify-end mt-6">
                     <button className="btn btn-primary" onClick={handleDownload}>
                       Download for {selectedFormat}
                     </button>
