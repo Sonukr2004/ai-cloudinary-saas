@@ -31,7 +31,10 @@ body {
       drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     animation: burn-flicker 2.5s ease-in-out infinite;
   }
-
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.95); }
+}
   @keyframes burn-flicker {
     0%,
     100% {
