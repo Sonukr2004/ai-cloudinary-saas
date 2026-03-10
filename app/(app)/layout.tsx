@@ -20,7 +20,7 @@ const sidebarItems = [
   { href: "/social-share", icon: Share2Icon, label: "Social Share" },
   { href: "/cloudcraft-chat", icon: MessageSquareIcon, label: "Talk to CloudCraft" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
-   { href: "/game", icon: GamepadIcon, label: "Play Game" },
+   { href: "/game", icon: GamepadIcon, label: "CloudCraft Quiz " },
   { href: "/about", icon: InfoIcon, label: "About" },
 ];
 

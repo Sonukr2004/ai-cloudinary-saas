@@ -217,21 +217,21 @@ export default function GamePage() {
           ) : (
             <div className="space-y-3">
               {leaderboard.map((entry, index) => (
-                <div key={entry.userId} className="flex items-center justify-between p-3 rounded-lg bg-base-200">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
-                    </span>
-                    <div>
-                      <p className="font-bold">{entry.username}</p>
-                      <p className="text-xs text-base-content/50">{entry.gamesPlayed} games played</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-primary">{entry.score} pts</p>
-                    <p className="text-xs">{entry.badge}</p>
-                  </div>
-                </div>
+               <div key={entry.userId} className="flex items-center justify-between p-3 rounded-lg bg-base-200 gap-2">
+  <div className="flex items-center gap-2 min-w-0">
+    <span className="text-2xl flex-shrink-0">
+      {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
+    </span>
+    <div className="min-w-0">
+      <p className="font-bold text-sm truncate max-w-[160px] sm:max-w-none">{entry.username}</p>
+      <p className="text-xs text-base-content/50">{entry.gamesPlayed} games played</p>
+    </div>
+  </div>
+  <div className="text-right flex-shrink-0">
+    <p className="font-bold text-primary text-sm">{entry.score} pts</p>
+    <p className="text-xs">{entry.badge}</p>
+  </div>
+</div>
               ))}
             </div>
           )}
