@@ -58,7 +58,7 @@ function VideoUpload() {
         duration: duration || 0,
       });
 
-      router.push("/");
+      router.push("/home");
     } catch (error) {
       console.log(error);
       alert("Failed to upload video. Please try again.");
