@@ -86,9 +86,9 @@ export default function AppLayout({
             </div>
             <div className="flex-1">
               <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-lg sm:text-2xl font-bold tracking-tight cursor-pointer burning-text">
-                  CloudCraft Studio
-                </div>
+               <div className="btn btn-ghost normal-case text-lg sm:text-2xl font-bold tracking-tight cursor-pointer burning-text" style={{animation: "pulse 2s ease-in-out infinite"}}>
+  CloudCraft Studio
+</div>
               </Link>
             </div>
             <div className="flex-none flex items-center space-x-4">

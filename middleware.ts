@@ -16,10 +16,9 @@ export default clerkMiddleware((auth, req) => {
   const isApiRequest = currentUrl.pathname.startsWith("/api");
 
   // If logged in and on sign-in page, redirect to home
-  if (userId && currentUrl.pathname === "/sign-in") {
-    return NextResponse.redirect(new URL("/home", req.url));
-  }
-
+if (userId && isPublicRoute(req) && currentUrl.pathname !== "/") {
+  return NextResponse.redirect(new URL("/home", req.url));
+}
   // Not logged in
   if (!userId) {
     if (!isPublicRoute(req) && !isPublicApiRoute(req)) {
