@@ -11,32 +11,32 @@ function getBadge(score: number): string {
   return "🎮 Newbie";
 }
 
+function isToday(date: Date): boolean {
+  const now = new Date();
+  const todayUTC = `${now.getUTCFullYear()}-${now.getUTCMonth()}-${now.getUTCDate()}`;
+  const dateUTC = `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
+  return todayUTC === dateUTC;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { userId } = auth();
 
     if (userId) {
       const userScore = await prisma.userScore.findUnique({ where: { userId } });
-      if (userScore?.lastPlayedAt) {
-        const lastPlayed = new Date(userScore.lastPlayedAt);
-        const today = new Date();
-        const isSameDay =
-          lastPlayed.getDate() === today.getDate() &&
-          lastPlayed.getMonth() === today.getMonth() &&
-          lastPlayed.getFullYear() === today.getFullYear();
-
-        if (isSameDay) {
-          const leaderboard = await prisma.userScore.findMany({
-            orderBy: { score: "desc" },
-            take: 5,
-          });
-          return NextResponse.json({ alreadyPlayed: true, leaderboard, score: userScore.score, badge: userScore.badge });
-        }
+      if (userScore?.lastPlayedAt && isToday(new Date(userScore.lastPlayedAt))) {
+        const leaderboard = await prisma.userScore.findMany({
+          where: { lastPlayedAt: { gte: new Date(new Date().setUTCHours(0, 0, 0, 0)) } },
+          orderBy: { dailyScore: "desc" },
+          take: 5,
+        });
+        return NextResponse.json({ alreadyPlayed: true, leaderboard, score: userScore.dailyScore, badge: userScore.badge });
       }
     }
 
     const leaderboard = await prisma.userScore.findMany({
-      orderBy: { score: "desc" },
+      where: { lastPlayedAt: { gte: new Date(new Date().setUTCHours(0, 0, 0, 0)) } },
+      orderBy: { dailyScore: "desc" },
       take: 5,
     });
     return NextResponse.json({ alreadyPlayed: false, leaderboard });
@@ -52,43 +52,39 @@ export async function POST(request: NextRequest) {
     const { userId } = auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Block if already played today
     const existing = await prisma.userScore.findUnique({ where: { userId } });
-    if (existing?.lastPlayedAt) {
-      const lastPlayed = new Date(existing.lastPlayedAt);
-      const today = new Date();
-      const isSameDay =
-        lastPlayed.getDate() === today.getDate() &&
-        lastPlayed.getMonth() === today.getMonth() &&
-        lastPlayed.getFullYear() === today.getFullYear();
 
-      if (isSameDay) {
-        return NextResponse.json({ error: "Already played today" }, { status: 403 });
-      }
+    // Block if already played today
+    if (existing?.lastPlayedAt && isToday(new Date(existing.lastPlayedAt))) {
+      return NextResponse.json({ error: "Already played today" }, { status: 403 });
     }
 
     const { username, score } = await request.json();
 
     const newTotalScore = (existing?.score || 0) + score;
     const newGamesPlayed = (existing?.gamesPlayed || 0) + 1;
-    const badge = getBadge(newTotalScore);
+    const badge = getBadge(score);
 
     const userScore = await prisma.userScore.upsert({
       where: { userId },
       update: {
         score: newTotalScore,
+        dailyScore: score,
         badge,
         gamesPlayed: newGamesPlayed,
         username,
-        lastPlayedAt: new Date()
+        lastPlayedAt: new Date(),
+        lastResetAt: new Date(),
       },
       create: {
         userId,
         username,
         score: newTotalScore,
+        dailyScore: score,
         badge,
         gamesPlayed: newGamesPlayed,
-        lastPlayedAt: new Date()
+        lastPlayedAt: new Date(),
+        lastResetAt: new Date(),
       },
     });
 

@@ -3,19 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
-
-const questions = [
-  { question: "What does AI stand for?", options: ["Automated Integration", "Artificial Intelligence", "Advanced Interface", "Auto Imaging"], answer: 1 },
-  { question: "Which format is best for social media videos?", options: ["AVI", "MOV", "MP4", "WMV"], answer: 2 },
-  { question: "What does Cloudinary primarily do?", options: ["Database management", "Media optimization & delivery", "Code hosting", "Email marketing"], answer: 1 },
-  { question: "What is video compression?", options: ["Making video louder", "Reducing file size while keeping quality", "Adding filters", "Changing resolution"], answer: 1 },
-  { question: "Which image format supports transparency?", options: ["JPG", "BMP", "PNG", "GIF"], answer: 2 },
-  { question: "What does CDN stand for?", options: ["Content Delivery Network", "Central Data Node", "Cloud Distribution Net", "Content Data Node"], answer: 0 },
-  { question: "What is the ideal aspect ratio for Instagram square posts?", options: ["16:9", "4:5", "1:1", "3:2"], answer: 2 },
-  { question: "What does 4K resolution mean?", options: ["4000 colors", "~4000 pixels wide", "4GB file size", "4 frames per second"], answer: 1 },
-  { question: "Which platform uses 16:9 aspect ratio for covers?", options: ["Instagram", "Twitter", "LinkedIn", "Pinterest"], answer: 1 },
-  { question: "What is a keyframe in video?", options: ["A deleted frame", "A frame that defines start/end of transition", "A blurry frame", "A duplicate frame"], answer: 1 },
-];
+import { quizQuestions } from "../../data/questions";
 
 type GameState = "idle" | "playing" | "finished";
 
@@ -23,6 +11,7 @@ interface LeaderboardEntry {
   userId: string;
   username: string;
   score: number;
+  dailyScore: number;
   badge: string;
   gamesPlayed: number;
 }
@@ -38,7 +27,8 @@ export default function GamePage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [roundScore, setRoundScore] = useState(0);
   const [alreadyPlayed, setAlreadyPlayed] = useState(false);
-  const [shuffledQuestions, setShuffledQuestions] = useState(questions);
+  const [checking, setChecking] = useState(true);
+  const [shuffledQuestions, setShuffledQuestions] = useState(quizQuestions);
 
   const fetchLeaderboard = useCallback(async () => {
     try {
@@ -49,6 +39,8 @@ export default function GamePage() {
       setLeaderboard(res.data.leaderboard || []);
     } catch (error) {
       console.log("Failed to fetch leaderboard", error);
+    } finally {
+      setChecking(false);
     }
   }, []);
 
@@ -67,8 +59,8 @@ export default function GamePage() {
   }, [timeLeft, gameState, answered]);
 
   const startGame = () => {
-    if (alreadyPlayed) return;
-    setShuffledQuestions([...questions].sort(() => Math.random() - 0.5));
+    if (alreadyPlayed || checking) return;
+    setShuffledQuestions([...quizQuestions].sort(() => Math.random() - 0.5).slice(0, 10));
     setGameState("playing");
     setCurrentQuestion(0);
     setScore(0);
@@ -89,12 +81,15 @@ export default function GamePage() {
       points = 10;
       if (timeLeft > 5) points += 5;
     }
-    setScore((s) => s + points);
-    setRoundScore((s) => s + points);
+
+    const newScore = score + points;
+    const newRoundScore = roundScore + points;
+    setScore(newScore);
+    setRoundScore(newRoundScore);
 
     setTimeout(() => {
       if (currentQuestion + 1 >= shuffledQuestions.length) {
-        finishGame(score + points);
+        finishGame(newRoundScore);
       } else {
         setCurrentQuestion((q) => q + 1);
         setTimeLeft(10);
@@ -148,8 +143,12 @@ export default function GamePage() {
                   <div className="badge badge-secondary">🥈 Silver: 50+ pts</div>
                   <div className="badge badge-accent">🥉 Bronze: 20+ pts</div>
                 </div>
-                <button className="btn btn-primary btn-lg" onClick={startGame}>
-                  Start Game
+                <button
+                  className="btn btn-primary btn-lg"
+                  onClick={startGame}
+                  disabled={checking}
+                >
+                  {checking ? "Checking..." : "Start Game"}
                 </button>
               </>
             )}
@@ -176,14 +175,14 @@ export default function GamePage() {
               {q.options.map((option, index) => (
                 <button
                   key={index}
-                  className={`btn btn-outline w-full ${
+                  className={`btn w-full ${
                     answered
                       ? index === q.answer
                         ? "btn-success"
                         : index === selectedAnswer
                         ? "btn-error"
-                        : ""
-                      : "hover:btn-primary"
+                        : "btn-outline"
+                      : "btn-outline"
                   }`}
                   onClick={() => handleAnswer(index)}
                   disabled={answered}
@@ -217,21 +216,21 @@ export default function GamePage() {
           ) : (
             <div className="space-y-3">
               {leaderboard.map((entry, index) => (
-               <div key={entry.userId} className="flex items-center justify-between p-3 rounded-lg bg-base-200 gap-2">
-  <div className="flex items-center gap-2 min-w-0">
-    <span className="text-2xl flex-shrink-0">
-      {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
-    </span>
-    <div className="min-w-0">
-      <p className="font-bold text-sm truncate max-w-[160px] sm:max-w-none">{entry.username}</p>
-      <p className="text-xs text-base-content/50">{entry.gamesPlayed} games played</p>
-    </div>
-  </div>
-  <div className="text-right flex-shrink-0">
-    <p className="font-bold text-primary text-sm">{entry.score} pts</p>
-    <p className="text-xs">{entry.badge}</p>
-  </div>
-</div>
+                <div key={entry.userId} className="flex items-center justify-between p-3 rounded-lg bg-base-200 gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-xl flex-shrink-0">
+                      {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-xs truncate">{entry.username}</p>
+                      <p className="text-xs text-base-content/50">{entry.gamesPlayed} games played</p>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <p className="font-bold text-primary text-sm whitespace-nowrap">{entry.dailyScore} pts</p>
+                    <p className="text-xs whitespace-nowrap">{entry.badge}</p>
+                  </div>
+                </div>
               ))}
             </div>
           )}
